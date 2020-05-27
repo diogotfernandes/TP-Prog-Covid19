@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
     espaco = readBinData(binFile, &total);
 
-    mostraEspacos(espaco,total);
+    mostraEspacos(espaco,total); 
 
     printf("TOTAL ESPACOS->%d\n\n", total);
     int check = verificaID(espaco, total);
