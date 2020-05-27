@@ -32,10 +32,9 @@ int verificaID(local e[], int n);
 local* readBinData(char *nome, int *total);
 
 int main(int argc, char** argv) {
+    
+   
     ppessoa listaPessoas;
-    
-    
-
 
     lerPessoas();
 
@@ -81,7 +80,6 @@ int main(int argc, char** argv) {
 
 ppessoa lerPessoas() {
     ppessoa novo, anterior = NULL, lista = NULL;
-    pessoa aux;
 
     FILE *fr = fopen("pessoasA.txt", "r");
     if (!fr) {
@@ -89,32 +87,23 @@ ppessoa lerPessoas() {
         return NULL;
     }
 
-    aux.next = NULL;
-
-    while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) == 3) {
-        printf("%s\n", aux.id);
-        printf("%d\n", aux.idade);
-        printf("%s\n", aux.estado);
-
-        int n;
-
-        if (*aux.estado == 'D') {
-            fscanf(fr, "%d", &n);
-            printf("%d\n\n", n);
+    while (!feof(fr)) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
+        if (fscanf(fr, "%s %d %s", novo->id, &novo->idade, novo->estado) == 3) {
+            printf("ID: %s\n", novo->id);
+            printf("IDADE: %d\n", novo->idade);
+            printf("ESTADO: %s\n", novo->estado);
+            if (strcmp(novo->estado,"D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
+                fscanf(fr, "%d", &novo->diasDoente);
+                printf("DOENTE:%d\n", novo->diasDoente);
+            }
         }
-
-        //aux.diasDoente = &n;
-
-        printf("%d\n", aux.diasDoente);
-
         novo = (ppessoa) malloc(sizeof (pessoa));
         if (!novo) {
             printf("Erro a reservar memoria.\n");
             break;
         }
-        *novo = aux;
+        printf("\n");
     }
-
 }
 
 int nEspacos(char * nome) {
