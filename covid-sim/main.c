@@ -21,90 +21,101 @@ struct individuo {
     struct individuo *next;
 };
 
-ppessoa lerPessoas();
+ppessoa lerTXTpessoas();
+void mostraPessoas(ppessoa lista);
+
 
 int nEspacos(char * nome);
-
-int procuraPorID(local e[], int id, int total);
-int verificaLigacoes(local e[], int total);
-
 int verificaID(local e[], int n);
 local* readBinData(char *nome, int *total);
+void mostraEspacos(local e[], int total);
 
 int main(int argc, char** argv) {
-    
-   
-    ppessoa listaPessoas;
 
-    lerPessoas();
+    ppessoa lista = lerTXTpessoas();
+    mostraPessoas(lista);
 
     local *espaco = NULL;
     char binFile[25];
     printf("File Name:");
     scanf(" %s", &binFile); //TODO->fazer concatenação com a extensão .bin
+
     system("CLS");
 
+    //NUMERO DE ESPAÇOS(LOCAIS) NO FICHEIRO BINARIO
+    int total = nEspacos(binFile);
+    //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
+    espaco = readBinData(binFile, &total);
 
+    mostraEspacos(espaco,total);
 
-    int total = nEspacos(binFile); //NUMERO DE ESPAÇOS(LOCAIS) NO FICHEIRO BINARIO
-    espaco = readBinData(binFile, &total); //LER O FICHEIRO BINARIO E GUARDAR DADOS NUM VETOR DINAMICO
-
-    //espaco[2].liga[0] = 9;
-    //espaco[2].id = -1;
-    int nLigacoes;
-    nLigacoes = verificaLigacoes(espaco, total);
     printf("TOTAL ESPACOS->%d\n\n", total);
-    printf("TOTAL LIGACOES->%d\n\n", nLigacoes);
-
     int check = verificaID(espaco, total);
     if (check)
         printf("SEM ERROS! %d\n\n", check);
     else
         printf("COM ERROS! %d\n\n", check);
 
-
-
-    //printf("TOTAL =%d\n", total);
-    for (int i = 0; i < total; i++) {
-        printf("ID   -> \t[%d]\n", espaco[i].id);
-        printf("Cap. -> \t[%d]\n", espaco[i].capacidade);
-        for (int j = 0; j < 3; j++) {
-            if (espaco[i].liga[j] != -1)
-                printf("Liga[%d] -> \t[%d]\n", j, espaco[i].liga[j]);
-
-        }
-        printf("\n");
-    }
     return 0;
+
+}
+/*******************************PESSOAS*******************************/
+//LER LISTA CRIADA A PARTIR DO FICHEIRO DE PESSOAS
+
+void mostraPessoas(ppessoa lista) {
+    ppessoa aux = lista;
+
+    while (aux) {
+        printf("ID:\t%s\n", aux->id);
+        printf("IDADE:\t%d\n", aux->idade);
+        printf("ESTADO:\t%s\n", aux->estado);
+        if (strcmp(aux->estado, "D") == 0)
+            printf("DIAS :\t%d\n", aux->diasDoente);
+        printf("------------------------------------\n");
+
+        aux = aux -> next;
+    }
 }
 
-ppessoa lerPessoas() {
+ppessoa lerTXTpessoas() {
     ppessoa novo, anterior = NULL, lista = NULL;
+    pessoa aux;
 
     FILE *fr = fopen("pessoasA.txt", "r");
     if (!fr) {
+        printf("\a");
         printf("Erro a ler o ficheiro.\n");
         return NULL;
     }
 
-    while (!feof(fr)) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
-        if (fscanf(fr, "%s %d %s", novo->id, &novo->idade, novo->estado) == 3) {
-            printf("ID: %s\n", novo->id);
-            printf("IDADE: %d\n", novo->idade);
-            printf("ESTADO: %s\n", novo->estado);
-            if (strcmp(novo->estado,"D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
-                fscanf(fr, "%d", &novo->diasDoente);
-                printf("DOENTE:%d\n", novo->diasDoente);
-            }
+    aux.next = NULL;
+
+    while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
+        if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
+            fscanf(fr, "%d", &aux.diasDoente);
         }
         novo = (ppessoa) malloc(sizeof (pessoa));
         if (!novo) {
             printf("Erro a reservar memoria.\n");
             break;
         }
-        printf("\n");
+        *novo = aux;
+        //1ª iteração, a lista vai estar a NULL
+        if (lista == NULL)
+            lista = novo;
+        else
+            anterior->next = novo;
+        anterior = novo;
     }
+    fclose(fr);
+    return lista;
 }
+/*********************************************************************/
+
+
+/*******************************ESPAÇOS*******************************/
+
+//CONTA TOTAL DE ESPAÇOS
 
 int nEspacos(char * nome) {
     FILE *f;
@@ -124,9 +135,24 @@ int nEspacos(char * nome) {
     //printf("Numero de Espaços: %d", num);
 
     fclose(f);
-
     return num;
 }
+
+//LER VETOR DINÂMICO DOS ESPAÇOS
+
+void mostraEspacos(local e[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("ID   -> \t[%d]\n", e[i].id);
+        printf("Cap. -> \t[%d]\n", e[i].capacidade);
+        for (int j = 0; j < 3; j++) {
+            if (e[i].liga[j] != -1)
+                printf("Liga[%d] -> \t[%d]\n", j, e[i].liga[j]);
+        }
+        printf("\n");
+    }
+}
+
+//LÊ FICHEIRO BINÁRIO
 
 local* readBinData(char *nome, int *total) {
     FILE *f;
@@ -146,23 +172,23 @@ local* readBinData(char *nome, int *total) {
         fclose(f);
         exit(EXIT_FAILURE);
     }
-
     for (int i = 0; i < *total; i++) {
         fread(e, sizeof (local), *total, f);
     }
     fclose(f);
     return e;
 }
-
+//TODO: VERIFICAR LIGAÇÕES!!
+//VERIFICA ERROS NOS ESPAÇOS (ID's NEGATIVOS E ID's REPETIDOS)
 //Sem erros -> 1
 //Com erros -> 0
 
 int verificaID(local e[], int n) {
     int i, j;
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) 
+    {
         if (e[i].id < 0) //PROCURA ID'S NEGATIVOS
             return 0;
-
         for (j = i + 1; j < n; j++) //PROCURA ID'S REPETIDOS
         {
             if (e[i].id == e[j].id)
@@ -171,69 +197,4 @@ int verificaID(local e[], int n) {
     }
     return 1;
 }
-
-int verificaLigacoes(local e[], int total) {
-    int i, k, j, id = 0, index = 0, ligacoes = 0;
-
-    for (i = 0; i < total; i++) {
-        for (j = 0; j < 3; j++) {
-            id = e[i].liga[j];
-            if (id != -1) {
-                index = procuraPorID(e, id, total);
-                printf("ID A PROCURAR - [%d] \t ESTA NO INDICE - [%d]\n", id, index);
-                for (k = 0; k < 3; k++) {
-                    if (e[index].liga[k] == e[i].id) {
-                        ligacoes++;
-                        printf("[%d]==[%d]\n", e[index].liga[k], e[i].id);
-                        printf("EXISTE LIGACAO\n");
-                    } else
-                        printf("NA0 EXISTE LIGACAO\n");
-                }
-                printf("--------------------------\n");
-            }
-        }
-    }
-    return ligacoes;
-}
-
-//DADO UM ID, VAI ENCONTRAR QUAL É O SEU INDEX NO VETOR 
-//RECEBE O VETOR E O ID A PROCURAR, RETORNA O INDEX DAQUELE ID
-
-int procuraPorID(local e[], int id, int total) {
-    int i, j;
-
-    for (i = 0; i < total; i++) {
-        for (j = 0; j < 3; j++) {
-            if (e[i].id == id) {
-                return i;
-            }
-        }
-    }
-    return -1;
-}
-
-/*int checkConn(local e[], int index, int idAprocurar, int *total) 
-{
-    int j, i, idDestino;
-    int check = 0;
-    //printf("Sou o e[%d] e vou procurar o ID[%d]\n", index, idAprocurar);
-
-    for (i = 0; i < *total; i++) {
-        if (e[i].id == idAprocurar) {
-            idDestino = e[i].id;
-            for (j = 0; j < 3; j++) {
-                if (e[i].liga[j] != -1) {
-                    printf("[%d]\t", e[i].liga[j]);
-                    if (e[i].liga[j] == e[index].id) {
-                        printf("SUCCESS\n\n");
-                        check = 1;
-                        break;
-                    } else
-                        check = 0;
-                }
-            }
-            printf("-----------------------------------\n");
-        }
-    }
-    return check;
-}*/
+/*********************************************************************/
