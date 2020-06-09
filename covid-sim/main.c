@@ -1,9 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "utils.c"
+
+
 #define MAX 25
 
 typedef struct sala local, *plocal;
+typedef struct individuo pessoa, *ppessoa; //lalal
 
 struct sala {
     int id; // id numerico do local
@@ -11,18 +12,19 @@ struct sala {
     int liga[3]; // id das ligacoes (-1 nos casos nao usados)
 };
 
-typedef struct individuo pessoa, *ppessoa; //lalal
-
 struct individuo {
     char id[MAX]; //id, alfanumerico, do individuo
     int idade;
     char estado[1];
     int diasDoente;
-    struct individuo *next;
+    ppessoa next;
+    plocal local;
 };
 
 ppessoa lerTXTpessoas();
 void mostraPessoas(ppessoa lista);
+
+void alocaPessoas(ppessoa lista, local e[], int n);
 
 
 int nEspacos(char * nome);
@@ -32,12 +34,14 @@ void mostraEspacos(local e[], int total);
 
 int main(int argc, char** argv) {
 
+    initRandom();
+    
     ppessoa lista = lerTXTpessoas();
     mostraPessoas(lista);
 
     local *espaco = NULL;
     char binFile[25];
-    printf("File Name:");
+    printf("Ficheiro Binario:");
     scanf(" %s", &binFile); //TODO->fazer concatenação com a extensão .bin
 
     system("CLS");
@@ -47,14 +51,19 @@ int main(int argc, char** argv) {
     //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
     espaco = readBinData(binFile, &total);
 
-    mostraEspacos(espaco,total); 
+    mostraEspacos(espaco, total);
 
-    printf("TOTAL ESPACOS->%d\n\n", total);
+
+
+    /*printf("TOTAL ESPACOS->%d\n\n", total);
     int check = verificaID(espaco, total);
     if (check)
         printf("SEM ERROS! %d\n\n", check);
     else
-        printf("COM ERROS! %d\n\n", check);
+        printf("COM ERROS! %d\n\n", check);*/
+
+
+    alocaPessoas(lista, espaco, total);
 
     return 0;
 
@@ -89,6 +98,7 @@ ppessoa lerTXTpessoas() {
     }
 
     aux.next = NULL;
+    aux.local = NULL;
 
     while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
         if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
@@ -110,6 +120,27 @@ ppessoa lerTXTpessoas() {
     fclose(fr);
     return lista;
 }
+
+void alocaPessoas(ppessoa lista, plocal e, int n) {
+    int i, num;
+    //ppessoa aux = lista;
+
+    while (lista) {
+        
+        printf("%d\n", intUniformRnd(0, n));
+        
+        lista = lista->next;
+    }
+
+    for (i = 0; i < n; i++) {
+        //printf("%d\n", e[i].capacidade);
+        //lista->local = &e[i];
+        //lista = lista->next;
+    }
+
+}
+
+
 /*********************************************************************/
 
 
@@ -185,8 +216,7 @@ local* readBinData(char *nome, int *total) {
 
 int verificaID(local e[], int n) {
     int i, j;
-    for (i = 0; i < n; i++) 
-    {
+    for (i = 0; i < n; i++) {
         if (e[i].id < 0) //PROCURA ID'S NEGATIVOS
             return 0;
         for (j = i + 1; j < n; j++) //PROCURA ID'S REPETIDOS
