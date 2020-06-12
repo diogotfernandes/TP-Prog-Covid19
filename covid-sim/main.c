@@ -1,43 +1,19 @@
-#include "utils.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "utils.h"
+#include "local.h"
+#include "pessoa.h"
 
 
-#define MAX 25
-
-typedef struct sala local, *plocal;
-typedef struct individuo pessoa, *ppessoa; //lalal
-
-struct sala {
-    int id; // id numerico do local
-    int capacidade; // capacidade maxima
-    int liga[3]; // id das ligacoes (-1 nos casos nao usados)
-};
-
-struct individuo {
-    char id[MAX]; //id, alfanumerico, do individuo
-    int idade;
-    char estado[1];
-    int diasDoente;
-    ppessoa next;
-    plocal local;
-};
-
-ppessoa lerTXTpessoas();
-void mostraPessoas(ppessoa lista);
-
-void alocaPessoas(ppessoa lista, local e[], int n);
-
-
-int nEspacos(char * nome);
-int verificaID(local e[], int n);
-local* readBinData(char *nome, int *total);
-void mostraEspacos(local e[], int total);
 
 int main(int argc, char** argv) {
 
     initRandom();
-    
+
     ppessoa lista = lerTXTpessoas();
-    mostraPessoas(lista);
+
 
     local *espaco = NULL;
     char binFile[25];
@@ -51,6 +27,14 @@ int main(int argc, char** argv) {
     //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
     espaco = readBinData(binFile, &total);
 
+
+    /*
+    espaco[0].capacidade = 1;
+    espaco[1].capacidade = 2;
+    espaco[2].capacidade = 2;
+    espaco[3].capacidade = 1;
+     */
+
     mostraEspacos(espaco, total);
 
 
@@ -63,168 +47,45 @@ int main(int argc, char** argv) {
         printf("COM ERROS! %d\n\n", check);*/
 
 
-    alocaPessoas(lista, espaco, total);
 
+    alocaPessoas(lista, espaco, total);
+    //mostraPessoas(lista);
+
+    printf("\nxau\n\n");
+    int cmd;
+
+    do {
+        printf("\t\t***************MENU***************\n"
+                "\t\t*                                *\n"
+                "\t\t*      [1] Mostrar Pacientes     *\n"
+                "\t\t*      [2] Mostrar Locais        *\n"
+                "\t\t*      [3] Simulacao             *\n"
+                "\t\t*      [4] lalalala              *\n"
+                "\t\t*      [5] Sair                  *\n"
+                "\t\t*                                *\n"
+                "\t\t**********************************\n\n");
+        printf(">>>");
+        scanf("%d", &cmd);
+
+        switch (cmd) {
+            case 1:
+                system("CLS");
+                mostraPessoas(lista);
+                printf("\n\n\n");
+                break;
+            case 2:
+                system("CLS");
+                mostraEspacos(espaco, total);
+                printf("\n\n\n");
+                break;
+        }
+
+    } while (cmd != 5);
+    
+    free(lista);
+    free(espaco);
+
+    
     return 0;
 
 }
-/*******************************PESSOAS*******************************/
-//LER LISTA CRIADA A PARTIR DO FICHEIRO DE PESSOAS
-
-void mostraPessoas(ppessoa lista) {
-    ppessoa aux = lista;
-
-    while (aux) {
-        printf("ID:\t%s\n", aux->id);
-        printf("IDADE:\t%d\n", aux->idade);
-        printf("ESTADO:\t%s\n", aux->estado);
-        if (strcmp(aux->estado, "D") == 0)
-            printf("DIAS :\t%d\n", aux->diasDoente);
-        printf("------------------------------------\n");
-
-        aux = aux -> next;
-    }
-}
-
-ppessoa lerTXTpessoas() {
-    ppessoa novo, anterior = NULL, lista = NULL;
-    pessoa aux;
-
-    FILE *fr = fopen("pessoasA.txt", "r");
-    if (!fr) {
-        printf("\a");
-        printf("Erro a ler o ficheiro.\n");
-        return NULL;
-    }
-
-    aux.next = NULL;
-    aux.local = NULL;
-
-    while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
-        if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
-            fscanf(fr, "%d", &aux.diasDoente);
-        }
-        novo = (ppessoa) malloc(sizeof (pessoa));
-        if (!novo) {
-            printf("Erro a reservar memoria.\n");
-            break;
-        }
-        *novo = aux;
-        //1ª iteração, a lista vai estar a NULL
-        if (lista == NULL)
-            lista = novo;
-        else
-            anterior->next = novo;
-        anterior = novo;
-    }
-    fclose(fr);
-    return lista;
-}
-
-void alocaPessoas(ppessoa lista, plocal e, int n) {
-    int i, num;
-    //ppessoa aux = lista;
-
-    while (lista) {
-        
-        printf("%d\n", intUniformRnd(0, n));
-        
-        lista = lista->next;
-    }
-
-    for (i = 0; i < n; i++) {
-        //printf("%d\n", e[i].capacidade);
-        //lista->local = &e[i];
-        //lista = lista->next;
-    }
-
-}
-
-
-/*********************************************************************/
-
-
-/*******************************ESPAÇOS*******************************/
-
-//CONTA TOTAL DE ESPAÇOS
-
-int nEspacos(char * nome) {
-    FILE *f;
-    local e;
-    int num = 0;
-
-    f = fopen(nome, "rb");
-
-    if (f == NULL) {
-        printf("Erro no acesso ao ficheiro de leitura!\n");
-        return 0;
-    }
-    fseek(f, 0, SEEK_END);
-
-    num = ftell(f) / sizeof (local);
-
-    //printf("Numero de Espaços: %d", num);
-
-    fclose(f);
-    return num;
-}
-
-//LER VETOR DINÂMICO DOS ESPAÇOS
-
-void mostraEspacos(local e[], int n) {
-    for (int i = 0; i < n; i++) {
-        printf("ID   -> \t[%d]\n", e[i].id);
-        printf("Cap. -> \t[%d]\n", e[i].capacidade);
-        for (int j = 0; j < 3; j++) {
-            if (e[i].liga[j] != -1)
-                printf("Liga[%d] -> \t[%d]\n", j, e[i].liga[j]);
-        }
-        printf("\n");
-    }
-}
-
-//LÊ FICHEIRO BINÁRIO
-
-local* readBinData(char *nome, int *total) {
-    FILE *f;
-    local *e;
-
-    f = fopen(nome, "rb");
-    if (f == NULL) {
-        printf("\a");
-        printf("Erro no acceso ao Ficheiro [%s]\n", nome);
-        *total = 0;
-        exit(EXIT_FAILURE);
-    }
-
-    e = malloc(sizeof (local)* *total);
-    if (e == NULL) {
-        printf("Erro na alocação de memória dinâmica\n");
-        fclose(f);
-        exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < *total; i++) {
-        fread(e, sizeof (local), *total, f);
-    }
-    fclose(f);
-    return e;
-}
-//TODO: VERIFICAR LIGAÇÕES!!
-//VERIFICA ERROS NOS ESPAÇOS (ID's NEGATIVOS E ID's REPETIDOS)
-//Sem erros -> 1
-//Com erros -> 0
-
-int verificaID(local e[], int n) {
-    int i, j;
-    for (i = 0; i < n; i++) {
-        if (e[i].id < 0) //PROCURA ID'S NEGATIVOS
-            return 0;
-        for (j = i + 1; j < n; j++) //PROCURA ID'S REPETIDOS
-        {
-            if (e[i].id == e[j].id)
-                return 0;
-        }
-    }
-    return 1;
-}
-/*********************************************************************/
