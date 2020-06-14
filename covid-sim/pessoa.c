@@ -4,8 +4,19 @@
 #include "pessoa.h"
 #include "utils.h"
 
+
+/*ESTADO POSSÍVEIS
+ * [S] -> Saudável
+ * [D] -> Doente
+ * [I] -> Infetado
+ * 
+ * [C] -> Curado (após n dias ou c/ prob recuperaçao)
+ * [I] -> Imune (prob de ficar imune (20%; após ser curado))
+ */
+
 /*******************************PESSOAS*******************************/
 //LER LISTA CRIADA A PARTIR DO FICHEIRO DE PESSOAS
+
 void mostraPessoas(ppessoa lista) {
     ppessoa aux = lista;
 
@@ -26,11 +37,13 @@ void mostraPessoas(ppessoa lista) {
 }
 
 //LER FICHEIRO DE TEXTO E CRIAR LISTA LIGADA
-ppessoa lerTXTpessoas() {
+
+ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
+    int i, num, haEspaco = 0;
     ppessoa novo, anterior = NULL, lista = NULL;
     pessoa aux;
 
-    FILE *fr = fopen("pessoasA.txt", "r");
+    FILE *fr = fopen(file, "r");
     if (!fr) {
         printf("\a");
         printf("Erro a ler o ficheiro.\n");
@@ -38,7 +51,6 @@ ppessoa lerTXTpessoas() {
     }
 
     aux.next = NULL;
-    aux.local = NULL;
 
     while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
         if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
@@ -49,55 +61,137 @@ ppessoa lerTXTpessoas() {
             printf("Erro a reservar memoria.\n");
             break;
         }
-        *novo = aux;
-        //1ª iteração, a lista vai estar a NULL
-        if (lista == NULL)
-            lista = novo;
-        else
-            anterior->next = novo;
-        anterior = novo;
-    }
-    fclose(fr);
-    return lista;
-}
-
-//ATRIBUIR LOCAIS ÀS PESSOAS
-//CASSO NÃO EXISTA LOCAL C/ ESPAÇO, APONTA PARA NULL (FICA SEM LOCAL PARA A SIMULAÇÃO)
-void alocaPessoas(ppessoa lista, plocal e, int n) {
-    int i, num, haEspaco = 0;
-    //ppessoa aux = lista;
-
-    while (lista) {
 
         do {
-            num = intUniformRnd(0, n - 1);
-            //printf("[%d]", num);
+            num = intUniformRnd(0, nEspacos - 1);
 
             if (e[num].capacidade > 0) {
-                lista->local = &e[num];
+                aux.local = &e[num];
                 e[num].capacidade--;
-                printf("%d\n", e[num].capacidade);
+                //printf("%d\n", e[num].capacidade);
+                *novo = aux;
+                //1ª iteração, a lista vai estar a NULL
+                if (lista == NULL)
+                    lista = novo;
+                else
+                    anterior->next = novo;
                 break;
             }
 
             int contaVazios = 0;
 
-            for (i = 0; i < n; i++) {
+            for (i = 0; i < nEspacos; i++) {
                 if (e[i].capacidade > 0)
                     haEspaco = 1;
                 else
                     contaVazios++;
             }
 
-            if (contaVazios == n) {
-                lista->local = NULL;
+            if (contaVazios == nEspacos) {
+                anterior->next = NULL;
                 break;
-            }
 
+            }
         } while (haEspaco != 0);
 
+
+
+
+        anterior = novo;
+    }
+    fclose(fr);
+    return lista;
+}
+
+void libertaListaPessoas(ppessoa lista) {
+    ppessoa aux;
+
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->next;
+        free(aux);
+    }
+
+}
+
+
+//Calculo da Probabilidade de Recuperar em cada Iteração (Dia)
+//Calculo da Probabilidade de Ficar Imune (depois de curada) em cada Iteração (Dia)
+
+void modeloPropagacao(ppessoa lista, int dia) {
+
+    while (lista != NULL) {
+
+        //VERIFICA SE EXISTE ALGUÉM CURADO [C]
+        //SE EXISTIR CURADOS, CALCULA A PROBABILIDADE DE FICAR IMUNE [L]
+        if (strcmp(lista->estado, "C") == 0) {
+            int probImune = 0;
+
+            probImune = probEvento(0.2);
+
+            if (probImune) {
+                printf("[ProbImune] %s FICOU IMUNE!\n", lista->id);
+                strcpy(lista->estado, "L");
+            }
+
+
+            //printf("Estado: %s\n",lista->estado);
+        }
+
+        //DURAÇÃO MÁXIMA DA INFEÇÃO
+        //5+1DIA POR CADA DEZENA DE ANOS
+        //p.ex: 25 ANOS -> 5 + 2 = 7 DIAS PARA FICAR CURADO
+        if (strcmp(lista->estado, "D") == 0) {
+            int diaRecuperacao = 0;
+            diaRecuperacao = 5 + (lista->idade / 10);
+
+            if (lista->diasDoente >= diaRecuperacao) {
+                printf("\n%s FICOU CURADO APOS %d DIAS!\n", lista->id, diaRecuperacao);
+                strcpy(lista->estado, "C");
+            }
+            printf("Nome: %s \t", lista->id);
+            printf("DiasRecuperar [%d] - [%d] DiasDoente\n\n", lista->diasDoente, diaRecuperacao);
+        }
+
+
+        if (strcmp(lista->estado, "D") == 0) {
+            int probRec = 0;
+            float i = 0.0;
+
+            //CALCULAR A PROBABILIDADE DE FICAR RECUPERADO
+            i = (float) 1 / lista->idade;
+            probRec = probEvento(i);
+
+            //printf("[%s] - [%d]\n", lista->id, lista->idade);
+            //printf("1/%d = %f\n", lista->idade, i);
+
+            //CASO PROB = 1, O DOENTE FICA CURADO
+            if (probRec) {
+                printf("[ProbRecup] %s FICOU CURADO!\n", lista->id);
+                strcpy(lista->estado, "C");
+            }
+
+        }
+
+        lista->diasDoente++;
         lista = lista->next;
     }
 }
 
-/*********************************************************************/
+void taxaDisseminacao(ppessoa lista, plocal e, int nEspacos) {
+    int totalDoentes = 0, totalPessoas = 0;
+    
+    
+
+    for (int i = 0; i < nEspacos; i++) {
+        ppessoa p = lista;
+        while (p != NULL) {
+            if (p->local->id == e[i].id) {
+                totalPessoas++;
+            }
+            p = p->next;
+        }
+        printf("%d PESSOAS NA SALA ID[%d]\n", totalPessoas, e[i].id);
+        totalPessoas = 0;
+    }
+}

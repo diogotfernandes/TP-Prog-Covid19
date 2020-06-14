@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
+#include "pessoa.h"
 
 /*******************************ESPAÇOS*******************************/
 
@@ -30,6 +31,7 @@ int nEspacos(char * nome) {
 //LER VETOR DINÂMICO DOS ESPAÇOS
 
 void mostraEspacos(local e[], int n) {
+    
     for (int i = 0; i < n; i++) {
         printf("ID   -> \t[%d]\n", e[i].id);
         printf("Cap. -> \t[%d]\n", e[i].capacidade);

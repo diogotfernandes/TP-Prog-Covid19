@@ -6,19 +6,38 @@
 #include "local.h"
 #include "pessoa.h"
 
+#define MAX 80
 
+void simularDia(ppessoa p, int dia, int *n, plocal e) {
+    
+    
+
+    printf("\n*********************************************** DIA %d DA SIMULACAO! ***********************************************\n", dia);
+    modeloPropagacao(p,dia);
+    taxaDisseminacao(p,e,*(n));
+    printf("\n********************************************* FIM DO DIA %d DA SIMULACAO! ******************************************\n", dia);
+
+}
 
 int main(int argc, char** argv) {
 
     initRandom();
 
-    ppessoa lista = lerTXTpessoas();
-
-
+    //A simulação começa no dia 0 (zero)
+    int nDia = 0;
     local *espaco = NULL;
-    char binFile[25];
-    printf("Ficheiro Binario:");
-    scanf(" %s", &binFile); //TODO->fazer concatenação com a extensão .bin
+
+    char bin[] = ".bin";
+    char txt[] = ".txt";
+    char binFile[MAX], pplFile[MAX];
+
+    printf("Ficheiro Binario >>> ");
+    scanf(" %s", &binFile);
+    strcat(binFile, bin);
+
+    printf("\n\nFicheiro Pessoas >>> ");
+    scanf(" %s", &pplFile);
+    strcat(pplFile, txt);
 
     system("CLS");
 
@@ -27,35 +46,23 @@ int main(int argc, char** argv) {
     //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
     espaco = readBinData(binFile, &total);
 
-
-    /*
-    espaco[0].capacidade = 1;
+    /*espaco[0].capacidade = 1;
     espaco[1].capacidade = 2;
     espaco[2].capacidade = 2;
-    espaco[3].capacidade = 1;
-     */
-
-    mostraEspacos(espaco, total);
+    espaco[3].capacidade = 1;*/
 
 
 
-    /*printf("TOTAL ESPACOS->%d\n\n", total);
-    int check = verificaID(espaco, total);
-    if (check)
-        printf("SEM ERROS! %d\n\n", check);
-    else
-        printf("COM ERROS! %d\n\n", check);*/
+    ppessoa lista = carregarPessoas(pplFile, espaco, total);
+    
+    //validaPessoas(lista);
 
+    //mostraEspacos(espaco, total);
 
-
-    alocaPessoas(lista, espaco, total);
-    //mostraPessoas(lista);
-
-    printf("\nxau\n\n");
     int cmd;
 
     do {
-        printf("\t\t***************MENU***************\n"
+        printf("\t\t************** MENU **************\n"
                 "\t\t*                                *\n"
                 "\t\t*      [1] Mostrar Pacientes     *\n"
                 "\t\t*      [2] Mostrar Locais        *\n"
@@ -78,14 +85,17 @@ int main(int argc, char** argv) {
                 mostraEspacos(espaco, total);
                 printf("\n\n\n");
                 break;
+            case 3:
+                //system("CLS");
+                simularDia(lista, nDia,&total,espaco);
+                nDia++;
+                printf("\n\n\n");
+                break;
         }
 
     } while (cmd != 5);
-    
-    free(lista);
+
+    libertaListaPessoas(lista);
     free(espaco);
-
-    
     return 0;
-
 }
