@@ -21,13 +21,11 @@ void mostraPessoas(ppessoa lista);
 //Liberta memória ocupada pelos elementos da lista
 void libertaListaPessoas(ppessoa p);
 
-//Calculo da Probabilidade de Recuperar em cada Iteração (Dia)
-//Calculo da Probabilidade de Ficar Imune (depois de curada) em cada Iteração (Dia)
-void modeloPropagacao(ppessoa lista, int dia);
 
-void taxaDisseminacao(ppessoa lista, plocal e, int nEspacos);
 
-int validaPessoas(ppessoa lista);
+int validaPessoa(char *id,int idade, char *estado, int diasDoente, ppessoa p);
+
+
 
 #endif /* PESSOAS_H */
 

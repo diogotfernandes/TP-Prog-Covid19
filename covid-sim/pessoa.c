@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
+
 #include "pessoa.h"
 #include "utils.h"
 
@@ -26,10 +28,7 @@ void mostraPessoas(ppessoa lista) {
         printf("Estado -> \t%s\n", aux->estado);
         if (strcmp(aux->estado, "D") == 0)
             printf("Dias -> \t%d\n", aux->diasDoente);
-        if (aux->local != NULL)
-            printf("LocalID -> \t%d\n\n", aux->local->id);
-        else
-            printf("Sem Local\n\n");
+        printf("LocalID -> \t%d\n", aux->local->id);
         printf("------------------------------------\n\n");
 
         aux = aux -> next;
@@ -46,61 +45,119 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
     FILE *fr = fopen(file, "r");
     if (!fr) {
         printf("\a");
-        printf("Erro a ler o ficheiro.\n");
-        return NULL;
+        printf("ERRO NO ACESSO AO FICHEIRO DE TEXTO [%s].\n", file);
+        exit(EXIT_FAILURE);
     }
 
     aux.next = NULL;
 
-    while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
+    char id[25], estado[25];
+    int idade, diasDoente;
+
+    while (fscanf(fr, "%s %d %s", id, &idade, estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
+        if (strcmp(estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
+            fscanf(fr, "%d", &diasDoente);
+        }
+        /*while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
         if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
             fscanf(fr, "%d", &aux.diasDoente);
-        }
-        novo = (ppessoa) malloc(sizeof (pessoa));
-        if (!novo) {
-            printf("Erro a reservar memoria.\n");
-            break;
-        }
+        }*/
 
-        do {
-            num = intUniformRnd(0, nEspacos - 1);
+        //verifica dados
+        //se passaram a validaçao continua
+        //printf("%d\n", validaPessoa(id, idade, estado, diasDoente, lista));
+        if (validaPessoa(id, idade, estado, diasDoente, lista)) {
 
-            if (e[num].capacidade > 0) {
-                aux.local = &e[num];
-                e[num].capacidade--;
-                //printf("%d\n", e[num].capacidade);
-                *novo = aux;
-                //1ª iteração, a lista vai estar a NULL
-                if (lista == NULL)
-                    lista = novo;
-                else
-                    anterior->next = novo;
+            strcpy(aux.id, id);
+            aux.idade = idade;
+            strcpy(aux.estado, estado);
+            aux.diasDoente = diasDoente;
+
+            novo = (ppessoa) malloc(sizeof (pessoa));
+            if (!novo) {
+                printf("Erro a reservar memoria.\n");
                 break;
             }
 
-            int contaVazios = 0;
+            do {
+                num = intUniformRnd(0, nEspacos - 1);
 
-            for (i = 0; i < nEspacos; i++) {
-                if (e[i].capacidade > 0)
-                    haEspaco = 1;
-                else
-                    contaVazios++;
-            }
+                if (e[num].capacidade > 0) {
+                    aux.local = &e[num];
+                    e[num].capacidade--;
+                    //printf("%d\n", e[num].capacidade);
+                    *novo = aux;
+                    //1ª iteração, a lista vai estar a NULL
+                    if (lista == NULL)
+                        lista = novo;
+                    else
+                        anterior->next = novo;
+                    break;
+                }
 
-            if (contaVazios == nEspacos) {
-                anterior->next = NULL;
-                break;
+                int contaVazios = 0;
 
-            }
-        } while (haEspaco != 0);
+                for (i = 0; i < nEspacos; i++) {
+                    if (e[i].capacidade > 0)
+                        haEspaco = 1;
+                    else
+                        contaVazios++;
+                }
 
+                if (contaVazios == nEspacos) {
+                    anterior->next = NULL;
+                    break;
 
-
-
-        anterior = novo;
+                }
+            } while (haEspaco != 0);
+            anterior = novo;
+            diasDoente = 0, idade = 0;
+        }
     }
     fclose(fr);
     return lista;
+}
+
+int validaPessoa(char* id, int idade, char* estado, int diasDoente, ppessoa p) {
+
+    if (p == NULL) {
+        //printf("1a vez\n");
+    } else {
+        while (p != NULL) {
+            if (strcmp(p->id, id) == 0) {
+                printf("\n\aID %s REPETIDO (NAO VAI ENTRAR NA SIM)\n", id);
+                printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
+                getch();
+                return 0;
+            }
+            p = p->next;
+        }
+    }
+
+    /*printf("%s - ",id);
+    printf("%d - ",idade);
+    printf("%s - ",estado);
+    printf("%d\n",diasDoente);*/
+    if (idade < 1 || idade > 99) {
+        printf("\a");
+        printf("\n\aID %s COM IDADE INVALIDA! [%d] (NAO VAI ENTRAR NA SIM)\n", id, idade);
+        printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
+        getch();
+        //printf("\nIDADE\n");
+        return 0;
+    }
+    if (strcmp(estado, "S") == 0 || strcmp(estado, "I") == 0 || strcmp(estado, "D") == 0) {
+    } else {
+        printf("\a");
+        printf("\n\aID %s COM ESTADO INVALIDO! [%d] (NAO VAI ENTRAR NA SIM)\n", id, estado);
+        printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
+        getch();
+        //printf("\nS -> [%d]\n",strcmp("S",estado));
+        //printf("D -> [%d]\n",strcmp("D",estado));
+        //printf("I -> [%d]",strcmp("I",estado));
+        return 0;
+    }
+    return 1;
 }
 
 void libertaListaPessoas(ppessoa lista) {
@@ -115,83 +172,3 @@ void libertaListaPessoas(ppessoa lista) {
 }
 
 
-//Calculo da Probabilidade de Recuperar em cada Iteração (Dia)
-//Calculo da Probabilidade de Ficar Imune (depois de curada) em cada Iteração (Dia)
-
-void modeloPropagacao(ppessoa lista, int dia) {
-
-    while (lista != NULL) {
-
-        //VERIFICA SE EXISTE ALGUÉM CURADO [C]
-        //SE EXISTIR CURADOS, CALCULA A PROBABILIDADE DE FICAR IMUNE [L]
-        if (strcmp(lista->estado, "C") == 0) {
-            int probImune = 0;
-
-            probImune = probEvento(0.2);
-
-            if (probImune) {
-                printf("[ProbImune] %s FICOU IMUNE!\n", lista->id);
-                strcpy(lista->estado, "L");
-            }
-
-
-            //printf("Estado: %s\n",lista->estado);
-        }
-
-        //DURAÇÃO MÁXIMA DA INFEÇÃO
-        //5+1DIA POR CADA DEZENA DE ANOS
-        //p.ex: 25 ANOS -> 5 + 2 = 7 DIAS PARA FICAR CURADO
-        if (strcmp(lista->estado, "D") == 0) {
-            int diaRecuperacao = 0;
-            diaRecuperacao = 5 + (lista->idade / 10);
-
-            if (lista->diasDoente >= diaRecuperacao) {
-                printf("\n%s FICOU CURADO APOS %d DIAS!\n", lista->id, diaRecuperacao);
-                strcpy(lista->estado, "C");
-            }
-            printf("Nome: %s \t", lista->id);
-            printf("DiasRecuperar [%d] - [%d] DiasDoente\n\n", lista->diasDoente, diaRecuperacao);
-        }
-
-
-        if (strcmp(lista->estado, "D") == 0) {
-            int probRec = 0;
-            float i = 0.0;
-
-            //CALCULAR A PROBABILIDADE DE FICAR RECUPERADO
-            i = (float) 1 / lista->idade;
-            probRec = probEvento(i);
-
-            //printf("[%s] - [%d]\n", lista->id, lista->idade);
-            //printf("1/%d = %f\n", lista->idade, i);
-
-            //CASO PROB = 1, O DOENTE FICA CURADO
-            if (probRec) {
-                printf("[ProbRecup] %s FICOU CURADO!\n", lista->id);
-                strcpy(lista->estado, "C");
-            }
-
-        }
-
-        lista->diasDoente++;
-        lista = lista->next;
-    }
-}
-
-void taxaDisseminacao(ppessoa lista, plocal e, int nEspacos) {
-    int totalDoentes = 0, totalPessoas = 0;
-    
-    
-
-    for (int i = 0; i < nEspacos; i++) {
-        ppessoa p = lista;
-        while (p != NULL) {
-            if (p->local->id == e[i].id) {
-                totalPessoas++;
-            }
-            p = p->next;
-        }
-        printf("%d PESSOAS NA SALA ID[%d]\n", totalPessoas, e[i].id);
-        totalPessoas = 0;
-    }
-}

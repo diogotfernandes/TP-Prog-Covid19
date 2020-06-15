@@ -15,8 +15,9 @@ int nEspacos(char * nome) {
     f = fopen(nome, "rb");
 
     if (f == NULL) {
-        printf("Erro no acesso ao ficheiro de leitura!\n");
-        return 0;
+        printf("\a");
+        printf("ERRO NO ACESSO AO FICHEIRO BINARIO!\n");
+        exit(EXIT_FAILURE);
     }
     fseek(f, 0, SEEK_END);
 
@@ -33,13 +34,13 @@ int nEspacos(char * nome) {
 void mostraEspacos(local e[], int n) {
     
     for (int i = 0; i < n; i++) {
-        printf("ID   -> \t[%d]\n", e[i].id);
-        printf("Cap. -> \t[%d]\n", e[i].capacidade);
+        printf("ID   -> \t[ %d ]\n", e[i].id);
+        printf("Cap. -> \t[ %d ]\n", e[i].capacidade);
         for (int j = 0; j < 3; j++) {
             if (e[i].liga[j] != -1)
-                printf("Liga[%d] -> \t[%d]\n", j, e[i].liga[j]);
+                printf("Liga[%d] -> \t[ %d ]\n", j, e[i].liga[j]);
         }
-        printf("\n");
+        printf("------------------------------------\n\n");
     }
 }
 
@@ -52,7 +53,7 @@ local* readBinData(char *nome, int *total) {
     f = fopen(nome, "rb");
     if (f == NULL) {
         printf("\a");
-        printf("Erro no acceso ao Ficheiro [%s]\n", nome);
+        printf("ERRO NO ACESSO AO FICHEIRO BINARIO [%s]\n", nome);
         *total = 0;
         exit(EXIT_FAILURE);
     }
