@@ -10,10 +10,13 @@ struct sala {
 
 //Conta número de espaços no ficheiro binário
 int nEspacos(char * nome);
-//
+
+//VERIFICA ID'S REPETIDO E/OU NEGATIVOS
 int verificaID(local e[], int n);
+
 //Lê ficheiro binário e guarda num vetor dinâmico
 local* readBinData(char *nome, int *total);
+
 //Mostra o vetor de locais
 void mostraEspacos(local e[], int total);
 

@@ -9,23 +9,11 @@
 
 #define MAX 80
 
-void simularDia(ppessoa p, int dia, int *n, plocal e) {
-
-
-
-    printf("\n*********************************************** DIA %d DA SIMULACAO! ***********************************************\n", dia);
-    modeloPropagacao(p, dia);
-    taxaDisseminacao(p, e, *(n));
-    printf("\n********************************************* FIM DO DIA %d DA SIMULACAO! ******************************************\n", dia);
-
-}
-
 int main(int argc, char** argv) {
 
     initRandom();
-
-    //A simulação começa no dia 0 (zero)
-    int nDia = 0;
+    //A simulação começa no dia 1 (um)
+    int nDia = 1;
     local *espaco = NULL;
 
     char bin[] = ".bin";
@@ -34,12 +22,11 @@ int main(int argc, char** argv) {
 
     printf("Ficheiro Binario >>> ");
     scanf(" %s", &binFile);
-    strcat(binFile, bin);
+    strcat(binFile, bin);       //JUNTAR .bin AO FICHEIRO
 
     printf("\n\nFicheiro Pessoas >>> ");
     scanf(" %s", &pplFile);
-    strcat(pplFile, txt);
-
+    strcat(pplFile, txt);       //JUNTAR .txt AO FICHEIRO
 
 
     //NUMERO DE ESPAÇOS(LOCAIS) NO FICHEIRO BINARIO
@@ -47,16 +34,18 @@ int main(int argc, char** argv) {
     //LER O FICHEIRO BINARIO E GUARDAR DADOS NO VETOR DINAMICO 'espaco'
     espaco = readBinData(binFile, &total);
 
-    espaco[0].capacidade = 30;
-    espaco[1].capacidade = 5;
-    espaco[2].capacidade = 15;
-    espaco[3].capacidade = 7;
+    /*espaco[0].capacidade = 23;
+    espaco[1].capacidade = 23;
+    espaco[2].capacidade = 30;
+    espaco[3].capacidade = 25;*/
 
-
+    if (!verificaID(espaco, total)) {
+        printf("\n\aFALHOU A VERIFICACAO DOS ESPACOS!\n");
+        exit(EXIT_FAILURE);
+        getchar();
+    }
 
     ppessoa lista = carregarPessoas(pplFile, espaco, total);
-
-    //mostraEspacos(espaco, total);
 
     system("cls");
 
@@ -92,7 +81,9 @@ int main(int argc, char** argv) {
                 break;
             case 4:
                 system("CLS");
+                taxaDisseminacao(lista, espaco, total);
                 simularDia(lista, nDia, &total, espaco);
+
                 nDia++;
                 printf("\n\n\n");
                 break;
@@ -104,12 +95,8 @@ int main(int argc, char** argv) {
                 break;
             case 6:
                 system("CLS");
-                printf("ADD\n\n\n");
-                //doenteAleatorio(lista);
-                ppessoa tmp = doenteAleatorio(lista);
-                printf("IDADE:%s\n",tmp->id);
-                printf("a");
-                tmp = NULL;
+                printf("ADD\n");
+                lista = novoDoente(lista, espaco, total);
                 break;
             case 7:
                 system("CLS");
@@ -123,7 +110,7 @@ int main(int argc, char** argv) {
     printf("\nNome Ficheiro Populacao Final >>> ");
     scanf(" %s", &popTXT);
     escreveFicheiroPop(lista, popTXT);
-    escreveReport(lista, espaco, total);
+    escreveReport(lista, espaco, total,nDia);
 
     libertaListaPessoas(lista);
     free(espaco);

@@ -10,15 +10,12 @@
 /*ESTADO POSSÍVEIS
  * [S] -> Saudável
  * [D] -> Doente
- * [I] -> Infetado
+ * [I] -> Imune (prob de ficar imune (20%; após ser curado))
  * 
  * [C] -> Curado (após n dias ou c/ prob recuperaçao)
- * [I] -> Imune (prob de ficar imune (20%; após ser curado))
  */
 
-/*******************************PESSOAS*******************************/
 //LER LISTA CRIADA A PARTIR DO FICHEIRO DE PESSOAS
-
 void mostraPessoas(ppessoa lista) {
     ppessoa aux = lista;
 
@@ -36,7 +33,6 @@ void mostraPessoas(ppessoa lista) {
 }
 
 //LER FICHEIRO DE TEXTO E CRIAR LISTA LIGADA
-
 ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
     int i, num, haEspaco = 0;
     ppessoa novo, anterior = NULL, lista = NULL;
@@ -48,7 +44,6 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
         printf("ERRO NO ACESSO AO FICHEIRO DE TEXTO [%s].\n", file);
         exit(EXIT_FAILURE);
     }
-
     aux.next = NULL;
 
     char id[25], estado[25];
@@ -58,14 +53,8 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
         if (strcmp(estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
             fscanf(fr, "%d", &diasDoente);
         }
-        /*while (fscanf(fr, "%s %d %s", aux.id, &aux.idade, aux.estado) != EOF) { //while (!feof(in_file)) -> Devolve valor != 0 se o indicador de final de ficheiro foi atingido
-        if (strcmp(aux.estado, "D") == 0) { // if Return value = 0 then it indicates str1 is equal to str2.
-            fscanf(fr, "%d", &aux.diasDoente);
-        }*/
 
-        //verifica dados
-        //se passaram a validaçao continua
-        //printf("%d\n", validaPessoa(id, idade, estado, diasDoente, lista));
+        //VALIDA DADOS DAS PESSOAS - SE NÃO PASSAR NA VALIDAÇÃO, ESSA PESSOA É EXCLUÍDA DA SIMULAÇÃO
         if (validaPessoa(id, idade, estado, diasDoente, lista)) {
 
             strcpy(aux.id, id);
@@ -85,7 +74,6 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
                 if (e[num].capacidade > 0) {
                     aux.local = &e[num];
                     e[num].capacidade--;
-                    //printf("%d\n", e[num].capacidade);
                     *novo = aux;
                     //1ª iteração, a lista vai estar a NULL
                     if (lista == NULL)
@@ -96,18 +84,15 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
                 }
 
                 int contaVazios = 0;
-
                 for (i = 0; i < nEspacos; i++) {
                     if (e[i].capacidade > 0)
                         haEspaco = 1;
                     else
                         contaVazios++;
                 }
-
                 if (contaVazios == nEspacos) {
                     anterior->next = NULL;
                     break;
-
                 }
             } while (haEspaco != 0);
             anterior = novo;
@@ -118,10 +103,12 @@ ppessoa carregarPessoas(char *file, plocal e, int nEspacos) {
     return lista;
 }
 
+//VALIDA PESSOA
+//SE NAO PASSAR NA VALIDALÇÃO (->id repetido; ->idade [1 - 99]; ->estado inválido ), NÃO ENTRA NA SIMULAÇÃO
 int validaPessoa(char* id, int idade, char* estado, int diasDoente, ppessoa p) {
 
+    //1ª VEZ, OU SEJA, A LISTA ESTÁ VAZIA E NAO VERIFICA
     if (p == NULL) {
-        //printf("1a vez\n");
     } else {
         while (p != NULL) {
             if (strcmp(p->id, id) == 0) {
@@ -133,33 +120,43 @@ int validaPessoa(char* id, int idade, char* estado, int diasDoente, ppessoa p) {
             p = p->next;
         }
     }
-
-    /*printf("%s - ",id);
-    printf("%d - ",idade);
-    printf("%s - ",estado);
-    printf("%d\n",diasDoente);*/
     if (idade < 1 || idade > 99) {
         printf("\a");
         printf("\n\aID %s COM IDADE INVALIDA! [%d] (NAO VAI ENTRAR NA SIM)\n", id, idade);
         printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
         getch();
-        //printf("\nIDADE\n");
         return 0;
     }
+
+    //25 anos
+    //recupera = 5 + 2 = 7 dias
+    //se diasDoente >= recupera , salta fora
+    if (strcmp(estado, "D") == 0) {
+        int recupera = 0;
+        recupera = 5 + (idade / 10);
+
+        if (diasDoente >= recupera) {
+            printf("\a");
+            printf("\n\aID %s COM DIAS DOENTE SUPERIOR AO PERMITIDO! [%d] [%d>=%d] (NAO VAI ENTRAR NA SIM)\n", id, diasDoente, diasDoente, recupera);
+            printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
+            getch();
+            return 0;
+        }
+    }
+
+
     if (strcmp(estado, "S") == 0 || strcmp(estado, "I") == 0 || strcmp(estado, "D") == 0) {
     } else {
         printf("\a");
         printf("\n\aID %s COM ESTADO INVALIDO! [%d] (NAO VAI ENTRAR NA SIM)\n", id, estado);
         printf("CARREGA EM QQ TECLA PARA CONTINURAR!\n");
         getch();
-        //printf("\nS -> [%d]\n",strcmp("S",estado));
-        //printf("D -> [%d]\n",strcmp("D",estado));
-        //printf("I -> [%d]",strcmp("I",estado));
         return 0;
     }
     return 1;
 }
 
+//DESTRUIR ELEMENTOS DA LISTA    
 void libertaListaPessoas(ppessoa lista) {
     ppessoa aux;
 

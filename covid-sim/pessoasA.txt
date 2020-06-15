@@ -4,5 +4,5 @@ Tomas111   12   S
 PauloPires2   67    D   10
 LuisaSantos   40    D   3
 Zulmira2A    17 S
-DiogoF	21	S
-luisAlberto 23 I
+DiogoF	5	S
+DiogoF 23 I

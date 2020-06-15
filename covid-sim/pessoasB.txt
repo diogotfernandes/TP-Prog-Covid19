@@ -1,16 +1,16 @@
 PauloPires1  23  S
 SofiaA  23  S
 Tomas111   12   I
-PauloPires2   2    D   10
+PauloPires2   2    S
 MarcoMarquesAAA   40    I
 Zulmira2A    17 S
 Olivia1     12  S
-SamuelSimoes   56   D   1
+SamuelSimoes   56   S
 SandraS       56    D   1
 HugoA        20    D  3
 HugoB        25   D   10
 HugoC       14   D    5
-PauloAlves123   34   D   4
+PauloAlves123   34   S
 Carlos1     20   D    3
 CarlaCardoso  34   D   7
 SandraMotaA1   24  S 
@@ -21,19 +21,19 @@ LeonardoL  10   S
 PauloPes1  23  D 2
 AnaLebr34A  55  D 2
 Tomas11   12   S
-PauloPies2   67    D   10
+PauloPies2   67    S
 LuisSantos   40    D   3
 Zulira2A    17 D 2
 DiogoFr21	21	D 6
 luisAlberto 23 D 7
 uulmira2A    17 S
 OliviaMonteiro     12  S
-Simons   56   D   1
+Simons   56   S
 SandraSantos       56    D   1
 HugoAAA        20    D  3
-HugoBX        25   D   10
-HugoCSS       14   D    5
-PauloAlvesKinhas   34   D   4
+HugoBX        25   S
+HugoCSS       14   S
+PauloAlvesKinhas   34   S
 KRX964Ia1L	15 D 2
 ZQXGfTFIjQ 23 S
 wVdAmTjigx 34 D 2
@@ -44,3 +44,53 @@ lZBP5qBfuo 76 I
 Tf1sHdbOAp 46 D 5
 ru6MhtDzCU	23 D 5
 4pV3K77y41  32 D 6
+O9jxjB8Lwp 23 S
+MMn5OVrwoH 23 S
+TsOOVX7BSY 23 S
+QRKfNckbcb 23 S 
+8tDZWte49I 23 S
+gViBfDBRJ6 23 S
+ZtB7v1z7M3 23 S
+J57Pj548mh 23 S
+dt79w4tG8X 23 S
+cnXKLR96zZ 23 S
+MtT2VVYAmS 23 S
+dhTOWUFzDH 23 S
+oDis0LCyVp 23 S
+bANn65TuR5 23 S
+nS97hhQ5uf 23 S
+b76BOFyNNG 23 S
+48HRghZfES 23 S
+T95Qi6BfIr 23 S
+C97yUEkpNV 23 S
+DNXJEMF05B 23 S
+BphwEhqnRl 23 S
+WRHQMw35Y2 23 S
+S0j6WJ0thV 23 S
+ogqaqDdWJm 23 S
+zcawMOGdCW 23 S
+R25n80dwzE 23 S
+jSUyPDn5iF 23 S
+KgKL9lEJng 23 S
+4Co2qjglrG 23 S
+IavrXsruLN 23 S
+Exk65SLzWQ 23 S
+3IUrYGeAC1 23 S
+C5853I8p6M 23 S
+NowUxS6mbB 23 S
+8REDOZWnvy 23 S
+8U9KLkcW5g 23 S
+URN0dnEMNJ 23 S
+I8ACt0ZfL2 23 S
+UyslXy4TET 23 S
+qy7wEAWWbI 23 S
+9y219XrKK0 23 S
+3cJWV4RlHM 23 S
+WqlKV3POC1 23 S
+VDTioEAscY 23 S
+9KcphtiLuP 23 S
+pY27KJzZpR 23 S
+kEDD6880Rn 23 S
+rS1dH5kqtH 23 S
+pl1qa1XEej 23 S
+T0IUrZYLoS  23 S
